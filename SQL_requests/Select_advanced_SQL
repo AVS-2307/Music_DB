@@ -61,18 +61,18 @@ LEFT JOIN tracks t ON a.id = t.album_id
 WHERE duration_sec = (SELECT min(duration_sec) FROM tracks);
 
 --название альбомов, содержащих наименьшее количество треков;
-SELECT album_name, count(track_name) FROM albums a 
-LEFT JOIN tracks t ON a.id = t.album_id
-GROUP BY album_name
-order by count(*) asc
-limit 1;
-
---второй вариант min(count)
-with cte as (
-select album_name, count(track_name) count FROM albums a 
-LEFT JOIN tracks t ON a.id = t.album_id
-GROUP BY album_name)
-select album_name, min(count) from cte
-GROUP BY album_name
-order by min(count) asc
-limit 1;
+SELECT album_name FROM albums a 
+LEFT JOIN tracks t ON t.album_id = a.id
+WHERE t.album_id in (
+    SELECT album_id
+    FROM tracks
+    GROUP BY album_id
+    HAVING count(id) = (
+        SELECT count(id)
+        FROM tracks
+        GROUP BY album_id
+        ORDER BY count
+        limit 1
+    )
+)
+ORDER BY a.album_name
