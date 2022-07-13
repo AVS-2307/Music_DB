@@ -72,7 +72,7 @@ WHERE t.album_id in (
         FROM tracks
         GROUP BY album_id
         ORDER BY count
-        limit 1
+        LIMIT 1
     )
 )
 ORDER BY a.album_name
