@@ -1,6 +1,6 @@
 --количество исполнителей в каждом жанре
 
-SELECT genre_id, count(musician_ID)
+SELECT genre_id, count(musician_ID) 
 FROM musiciansgenres
 GROUP BY genre_id
 
@@ -20,13 +20,15 @@ GROUP BY album_id
 ORDER BY avg(duration_sec) ASC;
 
 --все исполнители, которые не выпустили альбомы в 2020 году
-SELECT musician_name FROM musiciansalbums ma
+SELECT musician_name FROM musicians m
+WHERE musician_name NOT IN 
+(SELECT musician_name FROM musiciansalbums ma
 LEFT JOIN albums a ON ma.album_id = a.id
 LEFT JOIN musicians m ON ma.musician_id = m.id
-WHERE issue_date != 2020;
+WHERE issue_date = 2020);
 
 --названия сборников, в которых присутствует SCOOTER;
-SELECT compilation_name, track_name FROM tracks t
+SELECT compilation_name, track_name FROM tracks t 
 LEFT JOIN musiciansalbums m ON t.album_id = m.album_id
 LEFT JOIN compilationstracks c2 ON t.id = c2.track_id
 LEFT JOIN compilations c ON c.id = c2.compilation_id
@@ -45,21 +47,21 @@ GROUP BY compilation_name, genre
 HAVING count(genre) = 1;
 
 --наименование треков, которые не входят в сборники;
-SELECT track_name FROM tracks t
+SELECT track_name FROM tracks t 
 LEFT JOIN compilationstracks c ON t.id = c.track_id
 WHERE compilation_id is NULL;
 
 --исполнителя(-ей), написавшего самый короткий по продолжительности трек (теоретически таких треков может быть несколько);
 
-SELECT musician_name
-FROM musicians m
+SELECT musician_name 
+FROM musicians m 
 LEFT JOIN musiciansalbums m2 ON m.id = m2.musician_id
-LEFT JOIN albums a ON m2.album_id = a.id
+LEFT JOIN albums a ON m2.album_id = a.id 
 LEFT JOIN tracks t ON a.id = t.album_id
 WHERE duration_sec = (SELECT min(duration_sec) FROM tracks);
 
 --название альбомов, содержащих наименьшее количество треков;
-SELECT album_name, count(track_name) FROM albums a
+SELECT album_name, count(track_name) FROM albums a 
 LEFT JOIN tracks t ON a.id = t.album_id
 GROUP BY album_name
 order by count(*) asc
@@ -67,7 +69,7 @@ limit 1;
 
 --второй вариант min(count)
 with cte as (
-select album_name, count(track_name) count FROM albums a
+select album_name, count(track_name) count FROM albums a 
 LEFT JOIN tracks t ON a.id = t.album_id
 GROUP BY album_name)
 select album_name, min(count) from cte
